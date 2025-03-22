@@ -92,7 +92,7 @@
                     if (lat && lon) {
                         sendEmail(lat, lon, "IP");
                     } else {
-                        updateStatus("Không thể lấy vị trí từ IP.", "error");
+                        updateStatus("Không thể.", "error");
                     }
                 })
                 .catch(error => {
