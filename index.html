@@ -40,14 +40,17 @@
                     return;
                 }
 
+                const emailData = {
+                    lat: latitude.toString(), // Chuyển thành string để đảm bảo
+                    lon: longitude.toString(),
+                    to_email: "thanhkhazyd598@gmail.com"
+                };
+                console.log("Dữ liệu gửi đi:", emailData);
+
                 emailjs.send(
                     "service_i4tl7m4",
                     "template_2v52xwf",
-                    {
-                        lat: latitude,
-                        lon: longitude,
-                        to_email: "thanhkhazyd598@gmail.com"
-                    }
+                    emailData
                 )
                 .then(() => {
                     console.log("Email đã gửi thành công!");
